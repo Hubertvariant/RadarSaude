@@ -21,7 +21,7 @@ export default function Header() {
                         </Text>
                     </View>
 
-                    <View className="flex-row gap-3">
+                    {/*<View className="flex-row gap-3">
                         <TouchableOpacity className="h-11 w-11 items-center justify-center rounded-full bg-white/20">
                             <Bell color="white" size={22} />
                         </TouchableOpacity>
@@ -29,7 +29,7 @@ export default function Header() {
                         <TouchableOpacity className="h-11 w-11 items-center justify-center rounded-full bg-white/20">
                             <UserCircle2 color="white" size={24} />
                         </TouchableOpacity>
-                    </View>
+                    </View>*/}
                 </View>
             </View>
         </LinearGradient>
