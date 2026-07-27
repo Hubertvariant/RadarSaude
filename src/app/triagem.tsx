@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { enviarTriagem } from "@/services/triagens";
 
 import Slider from "@react-native-community/slider";
 
@@ -12,16 +13,6 @@ import ProgressSteps from "@/components/ProgressSteps";
 
 import { estados, sintomas, tempos } from "@/data/triagem";
 import { Triagem } from "@/types/triagem";
-
-import { supabase } from "@/lib/supabase";
-
-export async function enviarTriagem(triagem: any) {
-  const { error } = await supabase
-    .from("triagens")
-    .insert(triagem);
-
-  if (error) throw error;
-}
 
 export default function PreTriagem() {
     const { unidadeId, unidadeNome, espera } = useLocalSearchParams();
@@ -50,20 +41,29 @@ export default function PreTriagem() {
         }));
     }
     async function proximo() {
-        if (etapa < 6) {
-            setEtapa(etapa + 1);
-            return;
-        }
+  if (etapa < 6) {
+    setEtapa(etapa + 1);
+    return;
+  }
 
-        console.log(triagem);
-        await enviarTriagem(triagem);
-        router.replace({
-            pathname: "/triagem-sucesso",
-            params: {
-                unidadeId: String(unidadeId),
-            },
-        });
-    }
+  try {
+    console.log("ENVIANDO:", triagem);
+
+    const resposta = await enviarTriagem(triagem);
+
+    console.log("SALVO:", resposta);
+
+    router.replace({
+      pathname: "/triagem-sucesso",
+      params: {
+        unidadeId: String(unidadeId),
+      },
+    });
+  } catch (error) {
+    console.error("ERRO AO SALVAR:", error);
+    alert("Não foi possível enviar a pré-triagem.");
+  }
+}
 
     function voltar() {
         if (etapa === 1) {

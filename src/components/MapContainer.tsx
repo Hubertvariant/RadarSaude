@@ -27,6 +27,7 @@ function corMarker(status: Unidade["status"]) {
 export default function MapContainer() {
   const [selecionada, setSelecionada] = useState<Unidade | null>(null);
 
+
   return (
     <View className="mx-5 mt-4 flex-1 overflow-hidden rounded-3xl">
 
