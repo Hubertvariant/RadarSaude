@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { enviarTriagem } from "@/services/triagens";
 
 import Slider from "@react-native-community/slider";
-
+import { unidades } from "@/data/unidades";
 import Input from "@/components/Input";
 import OpcaoCard from "@/components/OpcaoCard";
 import ProgressSteps from "@/components/ProgressSteps";
@@ -15,12 +15,29 @@ import { estados, sintomas, tempos } from "@/data/triagem";
 import { Triagem } from "@/types/triagem";
 
 export default function PreTriagem() {
-    const { unidadeId, unidadeNome, espera } = useLocalSearchParams();
+    const params = useLocalSearchParams();
+
+    const unidadeId = Number(params.unidadeId);
+    const unidadeNome = String(params.unidadeNome ?? "");
+    const espera = String(params.espera ?? "");
+    const unidade = unidades.find((u) => u.id === unidadeId);
+
+    const velocidadeMedia = 35; // km/h
+
+    const chegada = unidade
+        ? Math.round((unidade.distancia / velocidadeMedia) * 60)
+        : 0;
+
+    const tempoEspera = unidade?.espera ?? 0;
+
+    const total = chegada + tempoEspera;
+    console.log("PARAMS:", params);
+    console.log("unidadeId:", unidadeId);
 
     const [etapa, setEtapa] = useState(1);
 
     const [triagem, setTriagem] = useState<Triagem>({
-        unidadeId: Number(unidadeId),
+        unidadeId,
 
         estadoGeral: "",
 
@@ -41,29 +58,33 @@ export default function PreTriagem() {
         }));
     }
     async function proximo() {
-  if (etapa < 6) {
-    setEtapa(etapa + 1);
-    return;
-  }
+        if (etapa < 6) {
+            setEtapa(etapa + 1);
+            return;
+        }
 
-  try {
-    console.log("ENVIANDO:", triagem);
+        try {
+            console.log("ENVIANDO:", triagem);
 
-    const resposta = await enviarTriagem(triagem);
+            const resposta = await enviarTriagem(triagem);
 
-    console.log("SALVO:", resposta);
+            console.log("SALVO:", resposta);
 
-    router.replace({
-      pathname: "/triagem-sucesso",
-      params: {
-        unidadeId: String(unidadeId),
-      },
-    });
-  } catch (error) {
-    console.error("ERRO AO SALVAR:", error);
-    alert("Não foi possível enviar a pré-triagem.");
-  }
-}
+            router.replace({
+                pathname: "/triagem-sucesso",
+                params: {
+                    unidadeId: String(unidadeId),
+                    unidadeNome,
+                    chegada: String(chegada),
+                    espera: String(tempoEspera),
+                    total: String(total),
+                },
+            });
+        } catch (error) {
+            console.error("ERRO AO SALVAR:", error);
+            alert("Não foi possível enviar a pré-triagem.");
+        }
+    }
 
     function voltar() {
         if (etapa === 1) {

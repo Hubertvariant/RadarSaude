@@ -7,7 +7,7 @@ interface ProgressStepsProps {
 
 export default function ProgressSteps({
   etapa,
-  total = 2,
+  total = 3,
 }: ProgressStepsProps) {
   return (
     <View className="mt-10">

@@ -15,7 +15,6 @@ import CadastroForm from "@/components/CadastroForm";
 import ProgressSteps from "@/components/ProgressSteps";
 
 import { carregarUsuario, salvarUsuario } from "@/lib/storage";
-
 import { Usuario } from "@/types/usuario";
 
 export default function MeusDados() {
@@ -34,6 +33,14 @@ export default function MeusDados() {
     telefone: "",
     contatoEmergencia: "",
     tipoSanguineo: "",
+
+    cep: "",
+    rua: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
   });
 
   useEffect(() => {
@@ -42,16 +49,13 @@ export default function MeusDados() {
 
       const dados = await carregarUsuario();
 
-      if (!dados) return;
-
       setUsuario(dados);
 
-      // edição mostra todos os campos
-      setEtapa(2);
+      setEtapa(3);
     }
 
     carregar();
-  }, []);
+  }, [modoEdicao]);
 
   function atualizar<K extends keyof Usuario>(
     campo: K,
@@ -63,17 +67,57 @@ export default function MeusDados() {
     }));
   }
 
-  async function salvar() {
-    if (
-      !usuario.nome ||
-      !usuario.cpf ||
-      !usuario.cartaoSus ||
-      !usuario.dataNascimento
-    ) {
-      alert("Preencha todos os campos obrigatórios.");
-      return;
+  function validarEtapaAtual() {
+    if (etapa === 1) {
+      if (!usuario.nome) {
+        alert("Informe o nome.");
+        return false;
+      }
+
+      if (!usuario.cpf) {
+        alert("Informe o CPF.");
+        return false;
+      }
+
+      if (!usuario.cartaoSus) {
+        alert("Informe o Cartão SUS.");
+        return false;
+      }
+
+      if (!usuario.dataNascimento) {
+        alert("Informe a data de nascimento.");
+        return false;
+      }
     }
 
+    if (etapa === 2) {
+      if (!usuario.telefone) {
+        alert("Informe um telefone.");
+        return false;
+      }
+    }
+
+    if (etapa === 3) {
+      if (!usuario.cep) {
+        alert("Informe o CEP.");
+        return false;
+      }
+
+      if (!usuario.rua) {
+        alert("CEP inválido.");
+        return false;
+      }
+
+      if (!usuario.numero) {
+        alert("Informe o número.");
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  async function salvar() {
     await salvarUsuario(usuario);
 
     if (modoEdicao) {
@@ -84,12 +128,28 @@ export default function MeusDados() {
   }
 
   function proximo() {
-    if (etapa === 1 && !modoEdicao) {
-      setEtapa(2);
+    if (!validarEtapaAtual()) return;
+
+    if (!modoEdicao && etapa < 3) {
+      setEtapa(etapa + 1);
       return;
     }
 
     salvar();
+  }
+
+  function voltar() {
+    if (modoEdicao) {
+      router.back();
+      return;
+    }
+
+    if (etapa === 1) {
+      router.back();
+      return;
+    }
+
+    setEtapa((prev) => prev - 1);
   }
 
   return (
@@ -99,28 +159,23 @@ export default function MeusDados() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             padding: 24,
             paddingBottom: 80,
           }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
+          {/* HEADER */}
 
           <View className="flex-row items-center">
-
-            <TouchableOpacity onPress={() => router.back()}>
-              <ArrowLeft
-                size={26}
-                color="#0F172A"
-              />
+            <TouchableOpacity onPress={voltar}>
+              <ArrowLeft size={26} color="#0F172A" />
             </TouchableOpacity>
 
             <Text className="ml-4 text-3xl font-bold text-slate-900">
               {modoEdicao ? "Editar Dados" : "Meus Dados"}
             </Text>
-
           </View>
 
           <Text className="mt-3 text-slate-500">
@@ -130,7 +185,7 @@ export default function MeusDados() {
           </Text>
 
           {!modoEdicao && (
-            <ProgressSteps etapa={etapa} />
+            <ProgressSteps etapa={etapa} total={3} />
           )}
 
           <CadastroForm
@@ -140,18 +195,35 @@ export default function MeusDados() {
             atualizar={atualizar}
           />
 
-          <TouchableOpacity
-            className="mt-10 rounded-2xl bg-sky-600 py-4"
-            onPress={proximo}
-          >
-            <Text className="text-center text-lg font-bold text-white">
-              {etapa === 1 && !modoEdicao
-                ? "Próximo"
-                : modoEdicao
-                ? "Atualizar"
-                : "Salvar"}
-            </Text>
-          </TouchableOpacity>
+          {/* BOTÕES */}
+
+          <View className="mt-10 flex-row gap-4">
+
+            {etapa > 1 && !modoEdicao && (
+              <TouchableOpacity
+                onPress={voltar}
+                className="flex-1 rounded-2xl border border-sky-600 py-4"
+              >
+                <Text className="text-center text-lg font-bold text-sky-600">
+                  Voltar
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              onPress={proximo}
+              className="flex-1 rounded-2xl bg-sky-600 py-4"
+            >
+              <Text className="text-center text-lg font-bold text-white">
+                {modoEdicao
+                  ? "Atualizar"
+                  : etapa === 3
+                  ? "Salvar"
+                  : "Próximo"}
+              </Text>
+            </TouchableOpacity>
+
+          </View>
 
         </ScrollView>
       </KeyboardAvoidingView>

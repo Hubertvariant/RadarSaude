@@ -1,50 +1,41 @@
 import { supabase } from "@/lib/supabase";
 import { Unidade } from "@/types/unidade";
 
-export async function buscarUnidades() {
-  const { data, error } = await supabase
-    .from("unidades")
-    .select("*");
-
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-
-  if (error) {
-    throw error;
-  }
-
-  return data;
-}
-
-export async function buscarUnidadePorId(
-  id: number
-): Promise<Unidade | null> {
+export async function buscarUnidades(): Promise<Unidade[]> {
   const { data, error } = await supabase
     .from("unidades")
     .select("*")
-    .eq("id", id)
-    .single();
+    .eq("ativa", true)
+    .order("nome");
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
-  if (!data) {
-    return null;
-  }
+  return (data ?? []).map((u: any) => ({
+    id: u.id,
+    nome: u.nome,
+    tipo: u.tipo,
+    endereco: u.endereco,
 
-  return {
-    id: data.id,
-    nome: data.nome,
-    tipo: data.tipo,
-    endereco: data.endereco,
+    bairro: u.bairro,
+    cidade: u.cidade,
+    estado: u.estado,
 
-    latitude: data.latitude,
-    longitude: data.longitude,
+    telefone: u.telefone,
+    funcionamento: u.funcionamento,
+    especialidades: u.especialidades,
 
-    distancia: data.distancia,
-    espera: data.espera,
+    abrangencia: u.abrangencia,
+    bairros_atendidos: u.bairros_atendidos ?? [],
 
-    status: data.status as Unidade["status"],
-  };
+    latitude: u.latitude,
+    longitude: u.longitude,
+
+    espera: u.espera,
+    status: u.status,
+
+    ativa: u.ativa,
+
+    // será recalculada depois
+    distancia: 0,
+  }));
 }

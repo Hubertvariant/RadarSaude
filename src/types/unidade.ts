@@ -3,17 +3,39 @@ export interface Unidade {
 
   nome: string;
 
-  tipo: string;
+  tipo: "UBS" | "Postinho" | "PA18" | "UPA" | "Hospital";
 
   endereco: string;
 
-  latitude: number;
+  bairro: string;
 
-  longitude: number;
+  cidade: string;
+
+  estado: string;
+
+  telefone?: string;
+
+  funcionamento?: string;
+
+  especialidades?: string[];
+
+  abrangencia: "bairro" | "regional" | "municipal";
+
+  bairros_atendidos: string[];
 
   distancia: number;
 
   espera: number;
 
   status: "verde" | "amarelo" | "vermelho";
+
+  latitude: number;
+
+  longitude: number;
+
+  ativa?: boolean;
+
+ chegada?: number;
+
+ total?: number;
 }

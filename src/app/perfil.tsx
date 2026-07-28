@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { ArrowLeft, Pencil } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   ScrollView,
   Text,
@@ -17,15 +18,16 @@ import { Usuario } from "@/types/usuario";
 export default function Perfil() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     async function carregar() {
       const dados = await carregarUsuario();
-
       setUsuario(dados);
     }
 
     carregar();
-  }, []);
+  }, [])
+);
 
   if (!usuario) {
     return (

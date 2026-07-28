@@ -29,7 +29,7 @@ export default function BottomNavigation() {
   const pathname = usePathname();
 
   return (
-    <View className="absolute bottom-6 left-5 right-5 flex-row justify-around rounded-3xl bg-white py-4 shadow-xl">
+    <View className=" flex-row justify-around mt-2 bg-white py-4 shadow-xl">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const active = pathname === tab.route;

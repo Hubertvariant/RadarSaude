@@ -3,6 +3,25 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "@/constants/storageKeys";
 import { Usuario } from "@/types/usuario";
 
+export const usuarioVazio: Usuario = {
+  nome: "",
+  cpf: "",
+  cartaoSus: "",
+  dataNascimento: "",
+
+  telefone: "",
+  contatoEmergencia: "",
+  tipoSanguineo: "",
+
+  cep: "",
+  rua: "",
+  numero: "",
+  complemento: "",
+  bairro: "",
+  cidade: "",
+  estado: "",
+};
+
 export async function salvarUsuario(usuario: Usuario) {
   try {
     await AsyncStorage.setItem(
@@ -14,16 +33,21 @@ export async function salvarUsuario(usuario: Usuario) {
   }
 }
 
-export async function carregarUsuario(): Promise<Usuario | null> {
+export async function carregarUsuario(): Promise<Usuario> {
   try {
     const json = await AsyncStorage.getItem(STORAGE_KEYS.USUARIO);
 
-    if (!json) return null;
+    if (!json) {
+      return usuarioVazio;
+    }
 
-    return JSON.parse(json);
+    return {
+      ...usuarioVazio,
+      ...JSON.parse(json),
+    };
   } catch (error) {
     console.error("Erro ao carregar usuário:", error);
-    return null;
+    return usuarioVazio;
   }
 }
 

@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import {
+  Car,
   Clock3,
   MapPin,
   Navigation,
@@ -14,8 +15,13 @@ import {
 
 import { Unidade } from "@/types/unidade";
 
+interface UnidadeCalculada extends Unidade {
+  chegada?: number;
+  total?: number;
+}
+
 interface Props {
-  unidade: Unidade;
+  unidade: UnidadeCalculada;
   onClose: () => void;
 }
 
@@ -23,17 +29,34 @@ export default function BottomSheetUnidade({
   unidade,
   onClose,
 }: Props) {
-  function abrirGoogleMaps() {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${unidade.latitude},${unidade.longitude}`;
+  const chegada = unidade.chegada ?? 0;
+  const total = unidade.total ?? unidade.espera;
 
-    Linking.openURL(url);
+  function abrirGoogleMaps() {
+    Linking.openURL(
+      `https://www.google.com/maps/dir/?api=1&destination=${unidade.latitude},${unidade.longitude}`
+    );
   }
 
   function iniciarTriagem() {
     router.push({
       pathname: "/triagem",
       params: {
-        unidadeId: unidade.id,
+        unidadeId: String(unidade.id),
+        unidadeNome: unidade.nome,
+        espera: String(unidade.espera),
+        chegada: String(chegada),
+        total: String(total),
+      },
+    });
+  }
+
+  function abrirDetalhes() {
+    router.push({
+      pathname: `/unidade/${unidade.id}`,
+      params: {
+        chegada: String(chegada),
+        total: String(total),
       },
     });
   }
@@ -41,7 +64,7 @@ export default function BottomSheetUnidade({
   return (
     <View className="absolute bottom-0 left-0 right-0 rounded-t-3xl bg-white p-6 shadow-2xl">
 
-      {/* fechar */}
+      {/* Fechar */}
 
       <TouchableOpacity
         onPress={onClose}
@@ -63,43 +86,59 @@ export default function BottomSheetUnidade({
         {unidade.tipo}
       </Text>
 
-      {/* Espera */}
+      {/* Informações */}
 
-      <View className="mt-6 flex-row items-center">
+      <View className="mt-6">
 
-        <Clock3
-          size={20}
-          color="#0284C7"
-        />
+        <View className="flex-row items-center">
+          <Clock3
+            size={20}
+            color="#0284C7"
+          />
 
-        <Text className="ml-3 text-base text-slate-700">
-          Espera aproximada: {unidade.espera} min
-        </Text>
+          <Text className="ml-3 text-base text-slate-700">
+            Espera: {unidade.espera} min
+          </Text>
+        </View>
+
+        <View className="mt-4 flex-row items-center">
+          <Car
+            size={20}
+            color="#22C55E"
+          />
+
+          <Text className="ml-3 text-base text-slate-700">
+            Chegada: {chegada} min
+          </Text>
+        </View>
+
+        <View className="mt-4 flex-row items-center">
+          <MapPin
+            size={20}
+            color="#0284C7"
+          />
+
+          <Text className="ml-3 text-base text-slate-700">
+            {unidade.distancia.toFixed(1)} km
+          </Text>
+        </View>
 
       </View>
 
-      {/* Distância */}
+      {/* Tempo Total */}
 
-      <View className="mt-4 flex-row items-center">
-
-        <MapPin
-          size={20}
-          color="#0284C7"
-        />
-
-        <Text className="ml-3 text-base text-slate-700">
-          {unidade.distancia} km
+      <View className="mt-6 rounded-2xl bg-sky-50 p-4">
+        <Text className="text-center text-lg font-bold text-sky-700">
+          Atendimento estimado em {total} minutos
         </Text>
-
       </View>
 
       {/* Botões */}
 
       <TouchableOpacity
         onPress={abrirGoogleMaps}
-        className="mt-8 flex-row items-center justify-center rounded-2xl bg-sky-600 py-4"
+        className="mt-6 flex-row items-center justify-center rounded-2xl bg-sky-600 py-4"
       >
-
         <Navigation
           size={20}
           color="white"
@@ -108,18 +147,24 @@ export default function BottomSheetUnidade({
         <Text className="ml-3 text-lg font-bold text-white">
           Iniciar rota
         </Text>
+      </TouchableOpacity>
 
+      <TouchableOpacity
+        onPress={abrirDetalhes}
+        className="mt-4 rounded-2xl border border-slate-300 py-4"
+      >
+        <Text className="text-center text-lg font-bold text-slate-700">
+          Ver detalhes
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={iniciarTriagem}
-        className="mt-4 rounded-2xl border border-sky-600 py-4"
+        className="mt-4 rounded-2xl bg-emerald-600 py-4"
       >
-
-        <Text className="text-center text-lg font-bold text-sky-600">
+        <Text className="text-center text-lg font-bold text-white">
           Fazer pré-triagem
         </Text>
-
       </TouchableOpacity>
 
     </View>

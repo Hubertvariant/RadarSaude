@@ -47,3 +47,9 @@ export function ocultarSus(cartao: string) {
 
   return `•••• •••• •••• ${numeros.slice(-4)}`;
 }
+export function cep(texto: string) {
+  return texto
+    .replace(/\D/g, "")
+    .replace(/^(\d{5})(\d)/, "$1-$2")
+    .slice(0, 9);
+}

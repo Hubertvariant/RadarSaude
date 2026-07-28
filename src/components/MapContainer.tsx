@@ -1,12 +1,22 @@
 import { useState } from "react";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import { View } from "react-native";
 
 import BottomSheetUnidade from "@/components/BottomSheetUnidade";
-import FloatingButtons from "@/components/FloatingButtons";
 
-import { unidades } from "@/data/unidades";
 import { Unidade } from "@/types/unidade";
+
+interface UnidadeCalculada extends Unidade {
+  chegada?: number;
+  total?: number;
+}
+
+interface Props {
+  unidades: UnidadeCalculada[];
+}
 
 function corMarker(status: Unidade["status"]) {
   switch (status) {
@@ -24,21 +34,24 @@ function corMarker(status: Unidade["status"]) {
   }
 }
 
-export default function MapContainer() {
-  const [selecionada, setSelecionada] = useState<Unidade | null>(null);
+export default function MapContainer({
+  unidades,
+}: Props) {
+  const [selecionada, setSelecionada] =
+    useState<UnidadeCalculada | null>(null);
 
+  const primeira = unidades[0];
 
   return (
     <View className="mx-5 mt-4 flex-1 overflow-hidden rounded-3xl">
-
       <MapView
         provider={PROVIDER_GOOGLE}
         style={{ flex: 1 }}
         showsUserLocation
         showsMyLocationButton={false}
         initialRegion={{
-          latitude: -23.4197,
-          longitude: -51.4246,
+          latitude: primeira?.latitude ?? -23.4197,
+          longitude: primeira?.longitude ?? -51.4246,
           latitudeDelta: 0.03,
           longitudeDelta: 0.03,
         }}
@@ -51,14 +64,14 @@ export default function MapContainer() {
               longitude: unidade.longitude,
             }}
             title={unidade.nome}
-            description={`Espera: ${unidade.espera} minutos`}
+            description={`Tempo total: ${
+              unidade.total ?? unidade.espera
+            } min`}
             pinColor={corMarker(unidade.status)}
             onPress={() => setSelecionada(unidade)}
           />
         ))}
       </MapView>
-
-      <FloatingButtons />
 
       {selecionada && (
         <BottomSheetUnidade
@@ -66,7 +79,6 @@ export default function MapContainer() {
           onClose={() => setSelecionada(null)}
         />
       )}
-
     </View>
   );
 }

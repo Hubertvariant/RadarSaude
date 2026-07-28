@@ -1,93 +1,110 @@
 import { router } from "expo-router";
-import {
-  ChevronRight,
-  Clock3,
-  MapPin,
-} from "lucide-react-native";
+import { ChevronRight, Clock3, Car, MapPin } from "lucide-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
-import { STATUS } from "@/lib/status";
 
+import { STATUS } from "@/lib/status";
 import { Unidade } from "@/types/unidade";
 
-interface Props {
-  unidade: Unidade;
+interface UnidadeCalculada extends Unidade {
+    chegada?: number;
+    total?: number;
 }
 
-export default function UnidadeCard({ unidade }: Props) {
+interface Props {
+    unidade: UnidadeCalculada;
+    recomendado?: boolean;
+}
 
-  return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={() =>
-        router.push(`/unidade/${unidade.id}`)
-      }
-      className="mb-4 rounded-3xl bg-white p-5"
-    >
-      <View className="flex-row items-center justify-between">
+export default function UnidadeCard({ unidade, recomendado = false }: Props) {
+    const velocidadeMedia = 35;
 
-        <View className="flex-1">
+    const chegada = Math.max(
+        1,
+        Math.round((unidade.distancia / velocidadeMedia) * 60),
+    );
 
-          <Text className="text-xl font-bold text-slate-900">
-            {unidade.nome}
-          </Text>
+    const total = chegada + unidade.espera;
 
-          <Text className="mt-1 text-slate-500">
-            {unidade.tipo}
-          </Text>
+    return (
+        <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() =>
+                router.push({
+                    pathname: `/unidade/${unidade.id}`,
+                    params: {
+                        distancia: unidade.distancia.toFixed(1),
+                        chegada: String(chegada),
+                        total: String(total),
+                    },
+                })
+            }
+            className="mb-4 rounded-3xl bg-white p-5"
+        >
+            {recomendado && (
+                <View className="mb-4 self-start rounded-full bg-emerald-500 px-3 py-1">
+                    <Text className="font-bold text-white">⭐ Recomendado para você</Text>
+                </View>
+            )}
+            <View className="flex-row items-center justify-between">
+                <View className="flex-1">
+                    <Text className="text-xl font-bold text-slate-900">
+                        {unidade.nome}
+                    </Text>
 
-        </View>
+                    <Text className="mt-1 text-slate-500">{unidade.tipo}</Text>
+                </View>
 
-        <ChevronRight color="#94A3B8" />
+                <ChevronRight color="#94A3B8" />
+            </View>
 
-      </View>
+            <View className="mt-5 flex-row items-center">
+                <View
+                    style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: 6,
+                        backgroundColor: STATUS[unidade.status].cor,
+                    }}
+                />
 
-      <View className="mt-5 flex-row items-center">
+                <Text className="ml-2 font-semibold">
+                    {STATUS[unidade.status].texto}
+                </Text>
+            </View>
 
-        <View
-          style={{
-            width: 12,
-            height: 12,
-            borderRadius: 6,
-            backgroundColor: STATUS[unidade.status].cor,
-          }}
-        />
+            <View className="mt-5 flex-row justify-between">
+                <View className="items-center">
+                    <Clock3 size={18} color="#0EA5E9" />
 
-        <Text className="ml-2 font-semibold">
-          {STATUS[unidade.status].texto}
-        </Text>
+                    <Text className="mt-1 font-semibold">{unidade.espera} min</Text>
 
-      </View>
+                    <Text className="text-xs text-slate-500">Espera</Text>
+                </View>
 
-      <View className="mt-5 flex-row justify-between">
+                <View className="items-center">
+                    <Car size={18} color="#22C55E" />
 
-        <View className="flex-row items-center">
+                    <Text className="mt-1 font-semibold">{chegada} min</Text>
 
-          <Clock3
-            size={18}
-            color="#0EA5E9"
-          />
+                    <Text className="text-xs text-slate-500">Chegada</Text>
+                </View>
 
-          <Text className="ml-2 text-slate-700">
-            {unidade.espera} min
-          </Text>
+                <View className="items-center">
+                    <MapPin size={18} color="#0284C7" />
 
-        </View>
+                    <Text className="mt-1 font-semibold">
+                        {unidade.distancia.toFixed(1)} km
+                    </Text>
 
-        <View className="flex-row items-center">
+                    <Text className="text-xs text-slate-500">Distância</Text>
+                </View>
+            </View>
 
-          <MapPin
-            size={18}
-            color="#0EA5E9"
-          />
-
-          <Text className="ml-2 text-slate-700">
-            {unidade.distancia.toFixed(1)} km
-          </Text>
-
-        </View>
-
-      </View>
-
-    </TouchableOpacity>
-  );
+            <View className="mt-5 rounded-2xl bg-sky-50 p-3">
+                <Text className="text-center text-base font-bold text-sky-700">
+                    Tempo total estimado: {total} minutos
+                </Text>
+            </View>
+        </TouchableOpacity>
+    );
 }

@@ -1,50 +1,23 @@
 import { supabase } from "@/lib/supabase";
+import { Triagem } from "@/types/triagem";
 
-export interface Triagem {
-  unidadeId: number;
-
-  estadoGeral: string;
-
-  sintoma: string;
-
-  tempoSintoma: string;
-
-  intensidade: number;
-
-  alergias: string;
-
-  observacoes: string;
-}
-
-
-export async function enviarTriagem(
-  dados: Triagem
-) {
-
+export async function enviarTriagem(triagem: Triagem) {
   const { data, error } = await supabase
     .from("triagens")
     .insert({
-      unidade_id: dados.unidadeId,
-
-      estado_geral: dados.estadoGeral,
-
-      sintoma: dados.sintoma,
-
-      tempo_sintoma: dados.tempoSintoma,
-
-      intensidade: dados.intensidade,
-
-      alergias: dados.alergias,
-
-      observacoes: dados.observacoes,
+      unidade_id: triagem.unidadeId,
+      estado_geral: triagem.estadoGeral,
+      sintoma: triagem.sintoma,
+      tempo_sintoma: triagem.tempoSintoma,
+      intensidade: triagem.intensidade,
+      alergias: triagem.alergias,
+      observacoes: triagem.observacoes,
     })
     .select();
-
 
   if (error) {
     throw error;
   }
-
 
   return data;
 }
