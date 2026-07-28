@@ -77,8 +77,9 @@ export default function Home() {
 
   return (
     <SafeAreaView 
-      className="h-screen w-full flex-col justify-between bg-slate-100 overflow-hidden"
-      edges={['top', 'left', 'right']}
+      className="flex-1 w-full bg-slate-100 overflow-hidden"
+      // PERMITE QUE A SAFE AREA CUIDE DO BOTTOM (BARRA DE GESTOS DO IPHONE/ANDROID)
+      edges={['top', 'left', 'right', 'bottom']}
     >
       {/* Área rolável da página */}
       <ScrollView
@@ -164,7 +165,7 @@ export default function Home() {
         />
       </ScrollView>
 
-      {/* Navegação fixa no rodapé da viewport */}
+      {/* Navegação fixa ajustada pela área segura */}
       <BottomNavigation />
     </SafeAreaView>
   );
