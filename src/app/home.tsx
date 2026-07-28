@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { Clock3, Navigation } from "lucide-react-native";
 
 import Header from "@/components/Header";
-import BottomNavigation from "@/components/BottomNavigation";
+import Sidebar from "@/components/Sidebar";
 import MapContainer from "@/components/MapContainer";
 import MapLegend from "@/components/MapLegend";
 import FilterChips from "@/components/FilterChips";
@@ -25,6 +25,7 @@ export default function Home() {
 
   const [unidades, setUnidades] = useState<Unidade[]>([]);
   const [filtro, setFiltro] = useState("Todos");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     async function carregar() {
@@ -76,17 +77,16 @@ export default function Home() {
   const melhorUnidade = unidadesFiltradas[0];
 
   return (
-    <View 
-      className="flex-1 w-full bg-slate-100 overflow-hidden"
-    >
-      {/* Área rolável da página */}
+    <SafeAreaView className="flex-1 bg-slate-100">
+      {/* Header com a função de abrir o menu */}
+      <Header onOpenMenu={() => setIsMenuOpen(true)} />
+
+      {/* Conteúdo rolável sem se preocupar com barras presas no fundo */}
       <ScrollView
-        className="flex-1 w-full"
-        contentContainerStyle={{ paddingBottom: 20 }}
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
-        <Header />
-
         {melhorUnidade && (
           <TouchableOpacity
             className="mx-5 mt-4 rounded-3xl bg-sky-600 p-5"
@@ -163,8 +163,11 @@ export default function Home() {
         />
       </ScrollView>
 
-      {/* Navegação fixa ajustada pela área segura */}
-      <BottomNavigation />
-    </View>
+      {/* Sidebar Lateral */}
+      <Sidebar
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+      />
+    </SafeAreaView>
   );
 }
