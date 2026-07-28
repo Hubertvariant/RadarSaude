@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Clock3, Navigation } from "lucide-react-native";
@@ -77,83 +77,91 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-100">
-      <Header />
+      {/* ScrollView englobando o conteúdo principal */}
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 20 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Header />
 
-      {melhorUnidade && (
-        <TouchableOpacity
-          className="mx-5 mt-4 rounded-3xl bg-sky-600 p-5"
-          activeOpacity={0.9}
-          onPress={() =>
-            router.push(`/unidade/${melhorUnidade.id}`)
-          }
-        >
-          <Text className="text-white text-sm font-semibold">
-            MELHOR OPÇÃO PARA VOCÊ
-          </Text>
+        {melhorUnidade && (
+          <TouchableOpacity
+            className="mx-5 mt-4 rounded-3xl bg-sky-600 p-5"
+            activeOpacity={0.9}
+            onPress={() =>
+              router.push(`/unidade/${melhorUnidade.id}`)
+            }
+          >
+            <Text className="text-white text-sm font-semibold">
+              MELHOR OPÇÃO PARA VOCÊ
+            </Text>
 
-          <Text className="mt-2 text-2xl font-bold text-white">
-            {melhorUnidade.nome}
-          </Text>
+            <Text className="mt-2 text-2xl font-bold text-white">
+              {melhorUnidade.nome}
+            </Text>
 
-          <Text className="mt-1 text-sky-100">
-            {melhorUnidade.tipo}
-          </Text>
+            <Text className="mt-1 text-sky-100">
+              {melhorUnidade.tipo}
+            </Text>
 
-          <View className="mt-5 flex-row justify-between">
-            <View className="items-center">
-              <Navigation
-                size={18}
-                color="white"
-              />
+            <View className="mt-5 flex-row justify-between">
+              <View className="items-center">
+                <Navigation
+                  size={18}
+                  color="white"
+                />
 
-              <Text className="mt-2 font-bold text-white">
-                {(melhorUnidade as any).chegada} min
-              </Text>
+                <Text className="mt-2 font-bold text-white">
+                  {(melhorUnidade as any).chegada} min
+                </Text>
 
-              <Text className="text-xs text-sky-100">
-                Chegada
-              </Text>
+                <Text className="text-xs text-sky-100">
+                  Chegada
+                </Text>
+              </View>
+
+              <View className="items-center">
+                <Clock3
+                  size={18}
+                  color="white"
+                />
+
+                <Text className="mt-2 font-bold text-white">
+                  {melhorUnidade.espera} min
+                </Text>
+
+                <Text className="text-xs text-sky-100">
+                  Espera
+                </Text>
+              </View>
+
+              <View className="items-center">
+                <Text className="text-2xl font-bold text-white">
+                  {(melhorUnidade as any).total}
+                </Text>
+
+                <Text className="text-xs text-sky-100">
+                  Total (min)
+                </Text>
+              </View>
             </View>
+          </TouchableOpacity>
+        )}
 
-            <View className="items-center">
-              <Clock3
-                size={18}
-                color="white"
-              />
+        <MapLegend />
 
-              <Text className="mt-2 font-bold text-white">
-                {melhorUnidade.espera} min
-              </Text>
+        <FilterChips
+          ativo={filtro}
+          onChange={setFiltro}
+        />
 
-              <Text className="text-xs text-sky-100">
-                Espera
-              </Text>
-            </View>
+        <MapContainer
+          unidades={unidadesFiltradas}
+        />
+      </ScrollView>
 
-            <View className="items-center">
-              <Text className="text-2xl font-bold text-white">
-                {(melhorUnidade as any).total}
-              </Text>
-
-              <Text className="text-xs text-sky-100">
-                Total (min)
-              </Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      )}
-
-      <MapLegend />
-
-      <FilterChips
-        ativo={filtro}
-        onChange={setFiltro}
-      />
-
-      <MapContainer
-        unidades={unidadesFiltradas}
-      />
-
+      {/* Navegação fixa na parte inferior */}
       <BottomNavigation />
     </SafeAreaView>
   );

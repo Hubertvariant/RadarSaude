@@ -1,12 +1,8 @@
 import { useState } from "react";
-import MapView, {
-  Marker,
-  PROVIDER_GOOGLE,
-} from "react-native-maps";
-import { View } from "react-native";
+import { View, Text } from "react-native";
+import { Map, Marker } from "pigeon-maps";
 
 import BottomSheetUnidade from "@/components/BottomSheetUnidade";
-
 import { Unidade } from "@/types/unidade";
 
 interface UnidadeCalculada extends Unidade {
@@ -34,44 +30,33 @@ function corMarker(status: Unidade["status"]) {
   }
 }
 
-export default function MapContainer({
-  unidades,
-}: Props) {
-  const [selecionada, setSelecionada] =
-    useState<UnidadeCalculada | null>(null);
+export default function MapContainer({ unidades }: Props) {
+  const [selecionada, setSelecionada] = useState<UnidadeCalculada | null>(null);
 
   const primeira = unidades[0];
 
+  // Coordenadas padrão caso não tenha nenhuma unidade
+  const centerDefault: [number, number] = [
+    primeira?.latitude ?? -23.4197,
+    primeira?.longitude ?? -51.4246,
+  ];
+
   return (
-    <View className="mx-5 mt-4 flex-1 overflow-hidden rounded-3xl">
-      <MapView
-        provider={PROVIDER_GOOGLE}
-        style={{ flex: 1 }}
-        showsUserLocation
-        showsMyLocationButton={false}
-        initialRegion={{
-          latitude: primeira?.latitude ?? -23.4197,
-          longitude: primeira?.longitude ?? -51.4246,
-          latitudeDelta: 0.03,
-          longitudeDelta: 0.03,
-        }}
+    <View className="mx-5 mt-4 flex-1 overflow-hidden rounded-3xl min-h-[300px]">
+      <Map
+        defaultCenter={centerDefault}
+        defaultZoom={13}
       >
         {unidades.map((unidade) => (
           <Marker
             key={unidade.id}
-            coordinate={{
-              latitude: unidade.latitude,
-              longitude: unidade.longitude,
-            }}
-            title={unidade.nome}
-            description={`Tempo total: ${
-              unidade.total ?? unidade.espera
-            } min`}
-            pinColor={corMarker(unidade.status)}
-            onPress={() => setSelecionada(unidade)}
+            width={35}
+            anchor={[unidade.latitude, unidade.longitude]}
+            color={corMarker(unidade.status)}
+            onClick={() => setSelecionada(unidade)}
           />
         ))}
-      </MapView>
+      </Map>
 
       {selecionada && (
         <BottomSheetUnidade
