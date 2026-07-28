@@ -9,16 +9,16 @@ const HOST = '0.0.0.0';
 const CLIENT_BUILD_DIR = path.join(__dirname, 'dist/client');
 const SERVER_BUILD_DIR = path.join(__dirname, 'dist/server');
 
-// Serve arquivos estáticos (CSS, JS, Imagens)
+// 1. Serve arquivos estáticos
 app.use(
   express.static(CLIENT_BUILD_DIR, {
     index: false,
   })
 );
 
-// No Express v5, usam-se rotas "splat" `/{*splat}` em vez do `*` puro
-app.all(
-  '/{*splat}',
+// 2. Encaminha todas as rotas para o adaptador SSR do Expo
+// No Express 5, basta passar o middleware direto sem a string '*'
+app.use(
   createRequestHandler({
     build: SERVER_BUILD_DIR,
   })
