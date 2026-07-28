@@ -159,10 +159,11 @@ export default function Home() {
         <MapContainer
           unidades={unidadesFiltradas}
         />
+        <BottomNavigation />
       </ScrollView>
 
       {/* Navegação fixa na parte inferior */}
-      <BottomNavigation />
+      
     </SafeAreaView>
   );
 }
