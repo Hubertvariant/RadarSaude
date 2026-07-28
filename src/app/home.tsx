@@ -76,10 +76,8 @@ export default function Home() {
   const melhorUnidade = unidadesFiltradas[0];
 
   return (
-    <SafeAreaView 
+    <View 
       className="flex-1 w-full bg-slate-100 overflow-hidden"
-      // PERMITE QUE A SAFE AREA CUIDE DO BOTTOM (BARRA DE GESTOS DO IPHONE/ANDROID)
-      edges={['top', 'left', 'right', 'bottom']}
     >
       {/* Área rolável da página */}
       <ScrollView
@@ -167,6 +165,6 @@ export default function Home() {
 
       {/* Navegação fixa ajustada pela área segura */}
       <BottomNavigation />
-    </SafeAreaView>
+    </View>
   );
 }
