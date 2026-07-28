@@ -76,10 +76,13 @@ export default function Home() {
   const melhorUnidade = unidadesFiltradas[0];
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-100">
-      {/* ScrollView englobando o conteúdo principal */}
+    <SafeAreaView 
+      className="h-screen w-full flex-col justify-between bg-slate-100 overflow-hidden"
+      edges={['top', 'left', 'right']}
+    >
+      {/* Área rolável da página */}
       <ScrollView
-        className="flex-1"
+        className="flex-1 w-full"
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
       >
@@ -159,11 +162,10 @@ export default function Home() {
         <MapContainer
           unidades={unidadesFiltradas}
         />
-        <BottomNavigation />
       </ScrollView>
 
-      {/* Navegação fixa na parte inferior */}
-      
+      {/* Navegação fixa no rodapé da viewport */}
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
